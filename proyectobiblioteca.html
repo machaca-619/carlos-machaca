@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📚 Biblioteca Digital Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    :root {
+        --primary: #1a5c37;
+        --primary-light: #2d8a54;
+        --bg-main: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://dical.es/modules/ph_simpleblog/covers/78.jpg');
+        --glass: rgba(255, 255, 255, 0.9);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.3);
+    }
+
+    body {
+        font-family: 'Outfit', sans-serif;
+        margin: 0;
+        background: var(--bg-main);
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: #1e293b;
+        min-height: 100vh;
+    }
+
+    header {
+        background: linear-gradient(90deg, #134e2d 0%, #1a5c37 100%);
+        color: white;
+        padding: 50px 20px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    header h1 { margin: 0; font-size: 38px; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+
+    .menu-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 20px;
+        padding: 0 40px;
+        max-width: 1100px;
+        margin: -35px auto 30px;
+        z-index: 10;
+        position: relative;
+    }
+
+    .card {
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        padding: 25px 15px;
+        border-radius: 20px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid rgba(255,255,255,0.5);
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card:hover { transform: translateY(-8px); background: white; border-color: var(--primary-light); }
+    .card i { font-size: 28px; margin-bottom: 12px; color: var(--primary); }
+    .card span { font-size: 14px; font-weight: 600; color: #334155; }
+
+    .content-box {
+        display: none;
+        background: white;
+        padding: 35px;
+        max-width: 950px;
+        margin: 20px auto 40px;
+        border-radius: 24px;
+        box-shadow: var(--shadow-md);
+        animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .box-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 15px;
+    }
+
+    .close-btn { background: #fee2e2; color: #ef4444; border: none; padding: 8px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+
+    input, textarea { 
+        width: 100%; padding: 12px; margin: 8px 0 16px; border-radius: 12px; border: 2px solid #e2e8f0; font-family: inherit; box-sizing: border-box; 
+    }
+    textarea { height: 100px; resize: none; }
+
+    .btn-action { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 600; width: 100%; cursor: pointer; transition: var(--transition); }
+    .btn-action:hover { background: var(--primary-light); transform: translateY(-2px); }
+
+    .catalogo-layout { display: flex; gap: 25px; min-height: 520px; margin-top: 10px; }
+    
+    .listado-libros-grid {
+        flex: 0 0 42%;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+    .libro-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: #f8fafc;
+        border-radius: 18px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .libro-item:hover { background: white; border-color: var(--primary-light); transform: translateX(5px); }
+    .libro-portada-lista { width: 60px; height: 85px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+    /* PANEL DETALLE */
+    .detalle-libro-preview {
+        flex: 1;
+        background: #0f172a;
+        border-radius: 24px;
+        position: relative;
+        overflow: hidden;
+        color: white;
+        height: 600px;
+    }
+
+    .portada-fondo {
+        position: absolute;
+        width: 100%; height: 100%;
+        object-fit: cover;
+        filter: blur(25px) brightness(0.25);
+        opacity: 0.7;
+        z-index: 1;
+    }
+
+    .detalle-contenido { 
+        position: relative; 
+        z-index: 2; 
+        padding: 25px; 
+        height: 100%; 
+        box-sizing: border-box; 
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .portada-detalle-superior {
+        width: 160px;
+        height: 230px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin: 0 auto 20px;
+        display: block;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        border: 2px solid rgba(255,255,255,0.1);
+    }
+
+    .sinopsis-box {
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 15px;
+        font-size: 14px;
+        line-height: 1.6;
+        border: 1px solid rgba(255,255,255,0.1);
+        text-align: justify;
+    }
+
+    /* Scrollbar sutil para el detalle */
+    .detalle-contenido::-webkit-scrollbar { width: 6px; }
+    .detalle-contenido::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<header>
+    <h1><i class="fa-solid fa-book-journal-whills"></i> Mi Biblioteca Digital</h1>
+</header>
+
+<div class="menu-container">
+    <div class="card" onclick="openBox('boxAgregarLibro')"><i class="fa-solid fa-plus-circle"></i><span>Nuevo Libro</span></div>
+    <div class="card" onclick="openBox('boxRegistrarSocio')"><i class="fa-solid fa-user-plus"></i><span>Nuevo Socio</span></div>
+    <div class="card" onclick="openBox('boxPrestarLibro')"><i class="fa-solid fa-hand-holding-hand"></i><span>Préstamo</span></div>
+    <div class="card" onclick="openBox('boxDevolverLibro')"><i class="fa-solid fa-rotate-left"></i><span>Devolución</span></div>
+    <div class="card" onclick="openBox('boxCatalogo'); mostrarCatalogo()"><i class="fa-solid fa-layer-group"></i><span>Catálogo</span></div>
+    <div class="card" onclick="openBox('boxSocios'); mostrarSocios()"><i class="fa-solid fa-users-gear"></i><span>Socios</span></div>
+</div>
+
+<div id="boxAgregarLibro" class="content-box">
+    <div class="box-header"><h2>Añadir a la Colección</h2><button class="close-btn" onclick="closeBox('boxAgregarLibro')">X</button></div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <input type="text" id="titulo" placeholder="Título">
+        <input type="text" id="autor" placeholder="Autor">
+        <input type="number" id="isbn" placeholder="ISBN (Solo números)">
+        <input type="text" id="categoria" placeholder="Género">
+    </div>
+    <input type="text" id="urlPortada" placeholder="URL de imagen">
+    <textarea id="sinopsisInput" placeholder="Escribe aquí la sinopsis completa..."></textarea>
+    <button class="btn-action" onclick="agregarLibro()">Guardar Libro</button>
+</div>
+
+<div id="boxRegistrarSocio" class="content-box">
+    <div class="box-header"><h2>Nuevo Socio</h2><button class="close-btn" onclick="closeBox('boxRegistrarSocio')">X</button></div>
+    <input type="text" id="nombreSocio" placeholder="Nombre completo">
+    <input type="number" id="idSocio" placeholder="Número de ID">
+    <button class="btn-action" onclick="registrarSocio()">Registrar Socio</button>
+</div>
+
+<div id="boxPrestarLibro" class="content-box">
+    <div class="box-header"><h2>Préstamo</h2><button class="close-btn" onclick="closeBox('boxPrestarLibro')">X</button></div>
+    <input type="number" id="isbnPrestamo" placeholder="ISBN">
+    <input type="number" id="idSocioPrestamo" placeholder="ID Socio">
+    <button class="btn-action" onclick="prestarLibro()">Prestar</button>
+</div>
+
+<div id="boxDevolverLibro" class="content-box">
+    <div class="box-header"><h2>Devolución</h2><button class="close-btn" onclick="closeBox('boxDevolverLibro')">X</button></div>
+    <input type="number" id="isbnDevolucion" placeholder="ISBN">
+    <input type="number" id="idSocioDevolucion" placeholder="ID Socio">
+    <button class="btn-action" onclick="devolverLibro()">Devolver</button>
+</div>
+
+<div id="boxCatalogo" class="content-box">
+    <div class="box-header"><h2>Catálogo de Libros</h2><button class="close-btn" onclick="closeBox('boxCatalogo')">Cerrar</button></div>
+    <div class="catalogo-layout">
+        <div id="catalogo-listado" class="listado-libros-grid"></div>
+        <div class="detalle-libro-preview">
+            <img id="portada-fondo" class="portada-fondo" src="">
+            <div id="detalle-preview" class="detalle-contenido">
+                <div style="height:100%; display:flex; align-items:center; justify-content:center; text-align:center">
+                    <p>Elige una obra para ver los detalles</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="boxSocios" class="content-box">
+    <div class="box-header"><h2>Socios</h2><button class="close-btn" onclick="closeBox('boxSocios')">X</button></div>
+    <div id="lista-socios-render"></div>
+</div>
+
+<script>
+    class Libro {
+        constructor(titulo, autor, isbn, categoria, urlPortada, sinopsis) {
+            this.titulo = titulo; this.autor = autor; this.isbn = isbn;
+            this.categoria = categoria; this.disponible = true; this.prestadoA = "Nadie";
+            this.urlPortada = urlPortada || 'https://via.placeholder.com/150x220?text=Sin+Imagen';
+            this.sinopsis = sinopsis || "Sinopsis no disponible.";
+        }
+    }
+
+    class Socio {
+        constructor(nombre, idSocio) {
+            this.nombre = nombre; this.idSocio = idSocio; this.librosPrestados = [];
+        }
+    }
+
+    class Biblioteca {
+        constructor() {
+            this.catalogo = []; this.socios = [];
+            this.inicializarDatos();
+        }
+        inicializarDatos() {
+            this.catalogo.push(new Libro("Halo: The Fall of Reach", "Eric Nylund", "25172552", "Ficción", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgaxDaVFie5bOu0wr3ndILYjbyLmNqwVAb_u1h7_FgoJI6ADhLxCTSYmsqicZyQ9F-WaiXMN-WczvfoAf3VCu1HHg2i3DKcdgbDZyLdw&s=10", "La Caída de Reach tiene lugar en el universo de Halo entre el año 2517 hasta los eventos de 2552. En el universo Halo es posible viajar más rápido que la velocidad de la luz, a través del desliespacio; un espacio donde la relatividad especial no aplica. Esto permite a los humanos colonizar cientos de planetas, los cuales son administrados por el Mando Espacial de las Naciones Unidas (UNSC o MENU en español). Sintiéndose reprimidas por el régimen autoritario del UNSC, algunas colonias se rebelan. Por temor a que los rebeldes desintegren el Consejo de Seguridad, los altos mandos militares aprueban el Proyecto SPARTAN-II; un escuadrón secreto de súper soldados para reprimir discretamente la rebelión."));
+            
+            this.catalogo.push(new Libro("Los guardianes de Ga Hoole I: La captura", "E.L. Swann", "98765432", "Literatura fantástica", "https://books.google.com.bo/books/content?id=Pr6s5dVChKwC&printsec=frontcover&img=1&zoom=1", "Soren nace en el bosque de Tyto, un reino tranquilo en el que habitan las lechuzas comunes. Soren es capturado y trasladado a un desfiladero sombrío e inhóspito. Lo llaman un orfanato, pero la joven lechuza cree que es algo mucho peor. Soren y sus amigos se unen para buscar la verdad y proteger el mundo de las lechuzas de un peligro inconcebible."));
+            
+            this.catalogo.push(new Libro("Harry Potter y la piedra filosofal", "J. K. Rowling", "11223344", "Novela", "https://static.wikia.nocookie.net/esharrypotter/images/9/9a/Harry_Potter_y_la_Piedra_Filosofal_Portada_Espa%C3%B1ol.PNG", "Harry Potter se ha quedado huérfano y vive en casa de sus abominables tíos y el insoportable primo Dudley. Harry se siente muy triste y solo, hasta que un buen día recibe una carta que cambiará su vida para siempre. En ella le comunican que ha sido aceptado como alumno en el Colegio Hogwarts de Magia."));
+            
+            this.socios.push(new Socio("Ana García", 101));
+        }
+        buscarLibro(isbn) { return this.catalogo.find(l => l.isbn == isbn); }
+        buscarSocio(id) { return this.socios.find(s => s.idSocio == id); }
+    }
+
+    const biblio = new Biblioteca();
+
+    function openBox(id) {
+        document.querySelectorAll('.content-box').forEach(b => b.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+    }
+    function closeBox(id) { document.getElementById(id).style.display = 'none'; }
+
+    function registrarSocio() {
+        const n = document.getElementById("nombreSocio").value;
+        const i = document.getElementById("idSocio").value;
+        if(n && i) {
+            biblio.socios.push(new Socio(n, i));
+            alert("Socio registrado.");
+            document.getElementById("nombreSocio").value = "";
+            document.getElementById("idSocio").value = "";
+        }
+    }
+
+    function mostrarSocios() {
+        document.getElementById("lista-socios-render").innerHTML = biblio.socios.map(s => `
+            <div class="socio-card" style="background:#f8fafc; padding:15px; border-radius:12px; margin-bottom:10px; border-left:4px solid var(--primary); display:flex; justify-content:space-between">
+                <div><strong>${s.nombre}</strong><br><small>ID: ${s.idSocio}</small></div>
+                <div style="font-size:12px">Prestados: ${s.librosPrestados.length}</div>
+            </div>`).join("");
+    }
+
+    function mostrarCatalogo() {
+        document.getElementById("catalogo-listado").innerHTML = biblio.catalogo.map(l => `
+            <div class="libro-item" onclick="mostrarDetalleLibro('${l.isbn}')">
+                <img src="${l.urlPortada}" class="libro-portada-lista">
+                <div class="libro-info">
+                    <h4 style="margin:0">${l.titulo}</h4>
+                    <p style="margin:4px 0; font-size:13px">${l.autor}</p>
+                    <small style="color:${l.disponible?'#10b981':'#ef4444'}"><i class="fa-solid fa-circle"></i> ${l.disponible?'Disponible':'Prestado'}</small>
+                </div>
+            </div>`).join("");
+    }
+
+    function mostrarDetalleLibro(isbn) {
+        const l = biblio.buscarLibro(isbn);
+        document.getElementById('portada-fondo').src = l.urlPortada;
+        document.getElementById('detalle-preview').innerHTML = `
+            <img src="${l.urlPortada}" class="portada-detalle-superior">
+            <h2 style="margin:0; text-align:center">${l.titulo}</h2>
+            <p style="text-align:center; opacity:0.8"><i class="fa-solid fa-pen-nib"></i> ${l.autor} | <i class="fa-solid fa-tag"></i> ${l.categoria}</p>
+            <p style="text-align:center"><strong>ISBN:</strong> ${l.isbn} | <strong>Estado:</strong> ${l.disponible?'Libre':'Prestado a '+l.prestadoA}</p>
+            <div class="sinopsis-box">
+                <strong>Sinopsis Completa:</strong><br><br>
+                ${l.sinopsis}
+            </div>
+        `;
+    }
+
+    function agregarLibro() {
+        const t = document.getElementById("titulo").value, a = document.getElementById("autor").value;
+        const i = document.getElementById("isbn").value, c = document.getElementById("categoria").value;
+        const u = document.getElementById("urlPortada").value, s = document.getElementById("sinopsisInput").value;
+        if(t && a && i) {
+            biblio.catalogo.push(new Libro(t, a, i, c, u, s));
+            alert("Libro añadido.");
+            document.querySelectorAll('#boxAgregarLibro input, #boxAgregarLibro textarea').forEach(el => el.value = "");
+            mostrarCatalogo();
+        } else { alert("Faltan datos."); }
+    }
+
+    function prestarLibro() {
+        const l = biblio.buscarLibro(document.getElementById("isbnPrestamo").value);
+        const s = biblio.buscarSocio(document.getElementById("idSocioPrestamo").value);
+        if(l && s && l.disponible) {
+            l.disponible = false; l.prestadoA = s.nombre;
+            s.librosPrestados.push(l.titulo); alert("Prestado."); mostrarCatalogo();
+        } else alert("Error en préstamo.");
+    }
+
+    function devolverLibro() {
+        const l = biblio.buscarLibro(document.getElementById("isbnDevolucion").value);
+        const s = biblio.buscarSocio(document.getElementById("idSocioDevolucion").value);
+        if(l && s && !l.disponible) {
+            l.disponible = true; l.prestadoA = "Nadie";
+            s.librosPrestados = s.librosPrestados.filter(t => t !== l.titulo);
+            alert("Devuelto."); mostrarCatalogo();
+        } else alert("Error en devolución.");
+    }
+</script>
+
+</body>
+</html>
