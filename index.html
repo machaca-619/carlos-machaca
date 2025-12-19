@@ -1,379 +1,599 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📚 Biblioteca Digital Pro</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>📚 Mi Biblioteca Digital Pro</title>
 
+<!-- Fuentes y iconos -->
+
+
+<!-- ======================= ESTILOS (TODO EN UNO) ======================= -->
 <style>
-    :root {
-        --primary: #1a5c37;
-        --primary-light: #2d8a54;
-        --bg-main: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://dical.es/modules/ph_simpleblog/covers/78.jpg');
-        --glass: rgba(255, 255, 255, 0.9);
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.3);
+    :root{
+        --primary:#1a5c37;
+        --primary-light:#2d8a54;
+        --accent:#14b8a6;
+        --bg-main:linear-gradient(rgba(0,0,0,.40),rgba(0,0,0,.40)),
+                   url('https://i.pinimg.com/736x/22/05/0d/22050d62f5f484bb1c7438c28304bca6.jpg');
+        --glass:rgba(255,255,255,0.90);
+        --shadow-md:0 10px 25px -5px rgba(0,0,0,0.30);
+        --shadow-sm:0 6px 18px -6px rgba(0,0,0,0.25);
+        --radius:18px;
+        --transition:all .3s cubic-bezier(.4,0,.2,1);
+    }
+    *{box-sizing:border-box}
+    body{
+        font-family:'Outfit',system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+        margin:0; color:#0f172a; background:var(--bg-main);
+        background-size:cover; background-position:center; background-attachment:fixed;
+        min-height:100vh;
     }
 
-    body {
-        font-family: 'Outfit', sans-serif;
-        margin: 0;
-        background: var(--bg-main);
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        color: #1e293b;
-        min-height: 100vh;
+    /* Hero / Encabezado */
+    header{
+        padding:72px 20px 40px;
+        text-align:center; color:#fff;
+        background:linear-gradient(90deg,#134e2d 0%, #1a5c37 100%);
+        box-shadow:var(--shadow-md);
+        position:sticky; top:0; z-index:10;
+    }
+    header h1{margin:0; font-weight:700; letter-spacing:.5px}
+    header p{opacity:.95; margin:.75rem auto 0; max-width:900px}
+
+    /* Barra de navegación */
+    nav{
+        display:flex; gap:10px; flex-wrap:wrap;
+        justify-content:center; padding:14px 18px; background:transparent;
+        position:sticky; top:0; z-index:9;
+    }
+    .tab-btn{
+        background:var(--glass); backdrop-filter:blur(8px);
+        border:1px solid rgba(255,255,255,.55);
+        padding:10px 16px; border-radius:14px; cursor:pointer;
+        box-shadow:var(--shadow-sm);
+        color:#0f172a; font-weight:600; transition:var(--transition);
+    }
+    .tab-btn:hover{transform:translateY(-2px); background:#fff}
+    .tab-btn.active{background:#e6f9f1; border-color:#b9ead1; color:var(--primary)}
+
+    /* Contenedor principal */
+    main{max-width:1100px; margin:30px auto; padding:0 18px}
+    .content-box{
+        display:none; padding:22px; border-radius:var(--radius);
+        background:var(--glass); backdrop-filter:blur(8px);
+        box-shadow:var(--shadow-md); border:1px solid rgba(255,255,255,.65);
+        margin-bottom:24px;
+        animation:fadeIn .25s ease;
+    }
+    .content-box.show{display:block}
+    @keyframes fadeIn{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
+
+    /* Grid de tarjetas de libros */
+    .grid{
+        display:grid; gap:18px;
+        grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    }
+    .book-card{
+        background:#fff; border-radius:16px; box-shadow:var(--shadow-sm);
+        overflow:hidden; display:flex; flex-direction:column;
+        transition:var(--transition);
+        border:1px solid #eef2f7;
+    }
+    .book-card:hover{transform:translateY(-3px)}
+    .cover{height:210px; background:#f8fafc; display:grid; place-items:center}
+    .cover img{width:100%; height:100%; object-fit:cover}
+    .card-body{padding:14px 14px 8px}
+    .title{font-weight:700; color:#0f172a; margin:0 0 6px}
+    .meta{font-size:.95rem; color:#334155; margin:0 0 8px}
+    .chips{
+        display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 12px;
+    }
+    .chip{
+        font-size:.8rem; padding:6px 10px; border-radius:999px;
+        border:1px solid #e2e8f0; color:#0f172a; background:#f8fafc;
+    }
+    .status{
+        font-size:.78rem; padding:6px 10px; border-radius:999px; font-weight:700;
+    }
+    .status.ok{background:#e8fff5; color:#0f766e; border:1px solid #b6f3e4}
+    .status.out{background:#fff3f0; color:#b45309; border:1px solid #fed7aa}
+
+    .actions{
+        display:flex; gap:10px; padding:10px 14px 14px; margin-top:auto;
+    }
+    .btn{
+        flex:1; padding:10px 12px; border-radius:12px; border:0; cursor:pointer;
+        font-weight:700; transition:var(--transition);
+    }
+    .btn:hover{filter:brightness(1.05); transform:translateY(-1px)}
+    .btn-primary{background:var(--primary); color:#fff}
+    .btn-secondary{background:#0ea5e9; color:#fff}
+    .btn-warning{background:#f59e0b; color:#fff}
+    .btn-danger{background:#ef4444; color:#fff}
+
+    /* Formularios */
+    form .row{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+    label{font-weight:600; color:#0f172a}
+    input,select,textarea{
+        width:100%; padding:10px 12px; border-radius:10px;
+        border:1px solid #dbe2ea; background:#fff; font-size:1rem;
+        transition:var(--transition);
+    }
+    textarea{min-height:92px; resize:vertical}
+    input:focus,select:focus,textarea:focus{
+        outline:none; border-color:var(--primary-light); box-shadow:0 0 0 3px #b9ead1
     }
 
-    header {
-        background: linear-gradient(90deg, #134e2d 0%, #1a5c37 100%);
-        color: white;
-        padding: 50px 20px;
-        text-align: center;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    /* Buscador y filtros */
+    .filters{display:grid; gap:10px; grid-template-columns:1.1fr .9fr .6fr}
+    .counter{font-weight:700; color:#0f172a}
+
+    /* Toast */
+    .toast{
+        position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
+        background:#111827; color:#fff; padding:12px 16px; border-radius:12px;
+        box-shadow:var(--shadow-md); opacity:0; pointer-events:none;
+        transition:var(--transition); z-index:50;
     }
+    .toast.show{opacity:1; pointer-events:auto}
 
-    header h1 { margin: 0; font-size: 38px; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-
-    .menu-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 20px;
-        padding: 0 40px;
-        max-width: 1100px;
-        margin: -35px auto 30px;
-        z-index: 10;
-        position: relative;
+    /* Pie */
+    footer{
+        text-align:center; color:#e2e8f0; padding:22px 18px 40px;
     }
-
-    .card {
-        background: var(--glass);
-        backdrop-filter: blur(10px);
-        padding: 25px 15px;
-        border-radius: 20px;
-        box-shadow: var(--shadow-md);
-        border: 1px solid rgba(255,255,255,0.5);
-        text-align: center;
-        cursor: pointer;
-        transition: var(--transition);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .card:hover { transform: translateY(-8px); background: white; border-color: var(--primary-light); }
-    .card i { font-size: 28px; margin-bottom: 12px; color: var(--primary); }
-    .card span { font-size: 14px; font-weight: 600; color: #334155; }
-
-    .content-box {
-        display: none;
-        background: white;
-        padding: 35px;
-        max-width: 950px;
-        margin: 20px auto 40px;
-        border-radius: 24px;
-        box-shadow: var(--shadow-md);
-        animation: slideUp 0.4s ease-out;
-    }
-
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-    .box-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-        border-bottom: 2px solid #f1f5f9;
-        padding-bottom: 15px;
-    }
-
-    .close-btn { background: #fee2e2; color: #ef4444; border: none; padding: 8px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; }
-
-    input, textarea { 
-        width: 100%; padding: 12px; margin: 8px 0 16px; border-radius: 12px; border: 2px solid #e2e8f0; font-family: inherit; box-sizing: border-box; 
-    }
-    textarea { height: 100px; resize: none; }
-
-    .btn-action { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 600; width: 100%; cursor: pointer; transition: var(--transition); }
-    .btn-action:hover { background: var(--primary-light); transform: translateY(-2px); }
-
-    .catalogo-layout { display: flex; gap: 25px; min-height: 520px; margin-top: 10px; }
-    
-    .listado-libros-grid {
-        flex: 0 0 42%;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        max-height: 600px;
-        overflow-y: auto;
-        padding-right: 10px;
-    }
-
-    .libro-item {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        padding: 15px;
-        background: #f8fafc;
-        border-radius: 18px;
-        border: 1px solid transparent;
-        cursor: pointer;
-        transition: var(--transition);
-    }
-
-    .libro-item:hover { background: white; border-color: var(--primary-light); transform: translateX(5px); }
-    .libro-portada-lista { width: 60px; height: 85px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-
-    /* PANEL DETALLE */
-    .detalle-libro-preview {
-        flex: 1;
-        background: #0f172a;
-        border-radius: 24px;
-        position: relative;
-        overflow: hidden;
-        color: white;
-        height: 600px;
-    }
-
-    .portada-fondo {
-        position: absolute;
-        width: 100%; height: 100%;
-        object-fit: cover;
-        filter: blur(25px) brightness(0.25);
-        opacity: 0.7;
-        z-index: 1;
-    }
-
-    .detalle-contenido { 
-        position: relative; 
-        z-index: 2; 
-        padding: 25px; 
-        height: 100%; 
-        box-sizing: border-box; 
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
-    }
-
-    .portada-detalle-superior {
-        width: 160px;
-        height: 230px;
-        object-fit: cover;
-        border-radius: 12px;
-        margin: 0 auto 20px;
-        display: block;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        border: 2px solid rgba(255,255,255,0.1);
-    }
-
-    .sinopsis-box {
-        background: rgba(255,255,255,0.08);
-        backdrop-filter: blur(10px);
-        padding: 20px;
-        border-radius: 15px;
-        margin-top: 15px;
-        font-size: 14px;
-        line-height: 1.6;
-        border: 1px solid rgba(255,255,255,0.1);
-        text-align: justify;
-    }
-
-    /* Scrollbar sutil para el detalle */
-    .detalle-contenido::-webkit-scrollbar { width: 6px; }
-    .detalle-contenido::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 </style>
 </head>
+
 <body>
+    <!-- ======================= HERO ======================= -->
+    <header>
+        <h1><i class="fa-solid fa-book-journal-whills"></i> Mi Biblioteca Digital</h1>
+        <p>Gestión simple de libros y préstamos con clases POO, CRUD completo y un diseño moderno de tarjetas.</p>
+    </header>
 
-<header>
-    <h1><i class="fa-solid fa-book-journal-whills"></i> Mi Biblioteca Digital</h1>
-</header>
+    <!-- ======================= NAV TABS ======================= -->
+    <nav id="nav">
+        <button class="tab-btn active" data-box="box-catalogo"><i class="fa-solid fa-layer-group"></i> Catálogo</button>
+        <button class="tab-btn" data-box="box-agregar"><i class="fa-solid fa-square-plus"></i> Añadir</button>
+        <button class="tab-btn" data-box="box-prestar"><i class="fa-solid fa-share-from-square"></i> Préstamo</button>
+        <button class="tab-btn" data-box="box-devolver"><i class="fa-solid fa-rotate-left"></i> Devolución</button>
+        <button class="tab-btn" data-box="box-socios"><i class="fa-solid fa-users"></i> Socios</button>
+    </nav>
 
-<div class="menu-container">
-    <div class="card" onclick="openBox('boxAgregarLibro')"><i class="fa-solid fa-plus-circle"></i><span>Nuevo Libro</span></div>
-    <div class="card" onclick="openBox('boxRegistrarSocio')"><i class="fa-solid fa-user-plus"></i><span>Nuevo Socio</span></div>
-    <div class="card" onclick="openBox('boxPrestarLibro')"><i class="fa-solid fa-hand-holding-hand"></i><span>Préstamo</span></div>
-    <div class="card" onclick="openBox('boxDevolverLibro')"><i class="fa-solid fa-rotate-left"></i><span>Devolución</span></div>
-    <div class="card" onclick="openBox('boxCatalogo'); mostrarCatalogo()"><i class="fa-solid fa-layer-group"></i><span>Catálogo</span></div>
-    <div class="card" onclick="openBox('boxSocios'); mostrarSocios()"><i class="fa-solid fa-users-gear"></i><span>Socios</span></div>
-</div>
+    <!-- ======================= CONTENIDO ======================= -->
+    <main>
+        <!-- --------- Catálogo --------- -->
+        <section id="box-catalogo" class="content-box show">
+            <div class="filters">
+                <input id="buscador" type="search" placeholder="Buscar por título o autor..." />
+                <select id="filtro-categoria">
+                    <option value="">Todas las categorías</option>
+                </select>
+                <select id="filtro-disponible">
+                    <option value="">Todos</option>
+                    <option value="true">Disponibles</option>
+                    <option value="false">Prestados</option>
+                </select>
+            </div>
+            <p class="counter" id="contador"></p>
 
-<div id="boxAgregarLibro" class="content-box">
-    <div class="box-header"><h2>Añadir a la Colección</h2><button class="close-btn" onclick="closeBox('boxAgregarLibro')">X</button></div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-        <input type="text" id="titulo" placeholder="Título">
-        <input type="text" id="autor" placeholder="Autor">
-        <input type="number" id="isbn" placeholder="ISBN (Solo números)">
-        <input type="text" id="categoria" placeholder="Género">
-    </div>
-    <input type="text" id="urlPortada" placeholder="URL de imagen">
-    <textarea id="sinopsisInput" placeholder="Escribe aquí la sinopsis completa..."></textarea>
-    <button class="btn-action" onclick="agregarLibro()">Guardar Libro</button>
-</div>
+            <div id="catalogo-grid" class="grid"></div>
+            <!-- por compatibilidad con tu función original (no usada aquí) -->
+            <div id="catalogo-listado" style="display:none"></div>
+        </section>
 
-<div id="boxRegistrarSocio" class="content-box">
-    <div class="box-header"><h2>Nuevo Socio</h2><button class="close-btn" onclick="closeBox('boxRegistrarSocio')">X</button></div>
-    <input type="text" id="nombreSocio" placeholder="Nombre completo">
-    <input type="number" id="idSocio" placeholder="Número de ID">
-    <button class="btn-action" onclick="registrarSocio()">Registrar Socio</button>
-</div>
+        <!-- --------- Añadir libro --------- -->
+        <section id="box-agregar" class="content-box">
+            <form id="form-agregar" onsubmit="event.preventDefault(); agregarLibro();">
+                <div class="row">
+                    <div>
+                        <label for="titulo">Título</label>
+                        <input id="titulo" required placeholder="Ej: El Principito" />
+                    </div>
+                    <div>
+                        <label for="autor">Autor</label>
+                        <input id="autor" required placeholder="Ej: Antoine de Saint-Exupéry" />
+                    </div>
+                    <div>
+                        <label for="isbn">ISBN</label>
+                        <input id="isbn" required placeholder="Ej: 9783161484100" />
+                    </div>
+                    <div>
+                        <label for="categoria">Categoría</label>
+                        <input id="categoria" placeholder="Ej: Novela" />
+                    </div>
+                    <div>
+                        <label for="urlPortada">URL Portada</label>
+                        <input id="urlPortada" placeholder="https://..." />
+                    </div>
+                </div>
+                <div style="margin-top:12px">
+                    <label for="sinopsisInput">Sinopsis</label>
+                    <textarea id="sinopsisInput" placeholder="Breve descripción..."></textarea>
+                </div>
+                <div style="margin-top:14px; display:flex; gap:10px">
+                    <button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Agregar libro</button>
+                    <button class="btn btn-secondary" type="reset"><i class="fa-solid fa-eraser"></i> Limpiar</button>
+                </div>
+            </form>
+        </section>
 
-<div id="boxPrestarLibro" class="content-box">
-    <div class="box-header"><h2>Préstamo</h2><button class="close-btn" onclick="closeBox('boxPrestarLibro')">X</button></div>
-    <input type="number" id="isbnPrestamo" placeholder="ISBN">
-    <input type="number" id="idSocioPrestamo" placeholder="ID Socio">
-    <button class="btn-action" onclick="prestarLibro()">Prestar</button>
-</div>
+        <!-- --------- Préstamo --------- -->
+        <section id="box-prestar" class="content-box">
+            <form id="form-prestar" onsubmit="event.preventDefault(); prestarLibro();">
+                <div class="row">
+                    <div>
+                        <label for="isbnPrestamo">ISBN del libro</label>
+                        <input id="isbnPrestamo" placeholder="ISBN" />
+                    </div>
+                    <div>
+                        <label for="idSocioPrestamo">ID del socio</label>
+                        <input id="idSocioPrestamo" placeholder="Ej: 101" />
+                    </div>
+                </div>
+                <div style="margin-top:14px">
+                    <button class="btn btn-warning" type="submit"><i class="fa-solid fa-share"></i> Realizar préstamo</button>
+                </div>
+            </form>
+            <hr style="margin:20px 0; border:0; border-top:1px solid #e2e8f0">
+            <p><strong>Socios registrados:</strong></p>
+            <ul id="lista-socios"></ul>
+        </section>
 
-<div id="boxDevolverLibro" class="content-box">
-    <div class="box-header"><h2>Devolución</h2><button class="close-btn" onclick="closeBox('boxDevolverLibro')">X</button></div>
-    <input type="number" id="isbnDevolucion" placeholder="ISBN">
-    <input type="number" id="idSocioDevolucion" placeholder="ID Socio">
-    <button class="btn-action" onclick="devolverLibro()">Devolver</button>
-</div>
+        <!-- --------- Devolución --------- -->
+        <section id="box-devolver" class="content-box">
+            <form id="form-devolver" onsubmit="event.preventDefault(); devolverLibro();">
+                <div class="row">
+                    <div>
+                        <label for="isbnDevolucion">ISBN del libro</label>
+                        <input id="isbnDevolucion" placeholder="ISBN" />
+                    </div>
+                    <div>
+                        <label for="idSocioDevolucion">ID del socio</label>
+                        <input id="idSocioDevolucion" placeholder="Ej: 101" />
+                    </div>
+                </div>
+                <div style="margin-top:14px">
+                    <button class="btn btn-secondary" type="submit"><i class="fa-solid fa-rotate-left"></i> Registrar devolución</button>
+                </div>
+            </form>
+        </section>
 
-<div id="boxCatalogo" class="content-box">
-    <div class="box-header"><h2>Catálogo de Libros</h2><button class="close-btn" onclick="closeBox('boxCatalogo')">Cerrar</button></div>
-    <div class="catalogo-layout">
-        <div id="catalogo-listado" class="listado-libros-grid"></div>
-        <div class="detalle-libro-preview">
-            <img id="portada-fondo" class="portada-fondo" src="">
-            <div id="detalle-preview" class="detalle-contenido">
-                <div style="height:100%; display:flex; align-items:center; justify-content:center; text-align:center">
-                    <p>Elige una obra para ver los detalles</p>
+        <!-- --------- Socios --------- -->
+        <section id="box-socios" class="content-box">
+            <div class="row">
+                <div>
+                    <label for="nuevoSocioNombre">Nombre del socio</label>
+                    <input id="nuevoSocioNombre" placeholder="Nombre completo" />
+                </div>
+                <div>
+                    <label for="nuevoSocioId">ID del socio</label>
+                    <input id="nuevoSocioId" placeholder="ID numérico" />
                 </div>
             </div>
-        </div>
-    </div>
-</div>
+            <div style="margin-top:14px; display:flex; gap:10px">
+                <button class="btn btn-primary" onclick="agregarSocio()"><i class="fa-solid fa-user-plus"></i> Añadir socio</button>
+                <button class="btn btn-danger" onclick="resetSocios()"><i class="fa-solid fa-users-slash"></i> Reiniciar socios</button>
+            </div>
+            <hr style="margin:20px 0; border:0; border-top:1px solid #e2e8f0">
+            <p><strong>Listado de socios:</strong></p>
+            <ul id="socios-listado"></ul>
+        </section>
+    </main>
 
-<div id="boxSocios" class="content-box">
-    <div class="box-header"><h2>Socios</h2><button class="close-btn" onclick="closeBox('boxSocios')">X</button></div>
-    <div id="lista-socios-render"></div>
-</div>
+    <div id="toast" class="toast"></div>
 
+    <footer>
+        Hecho con <i class="fa-solid fa-heart" style="color:#ef4444"></i> por Carlos — Santa Cruz
+    </footer>
+
+<!-- ======================= LÓGICA (POO + CRUD + UI) ======================= -->
 <script>
-    class Libro {
-        constructor(titulo, autor, isbn, categoria, urlPortada, sinopsis) {
-            this.titulo = titulo; this.autor = autor; this.isbn = isbn;
-            this.categoria = categoria; this.disponible = true; this.prestadoA = "Nadie";
-            this.urlPortada = urlPortada || 'https://via.placeholder.com/150x220?text=Sin+Imagen';
-            this.sinopsis = sinopsis || "Sinopsis no disponible.";
-        }
+/* =========================================================
+   CLASES (POO) – Libro y Socio
+========================================================= */
+class Libro {
+    constructor(titulo, autor, isbn, categoria, urlPortada, sinopsis) {
+        this.titulo = titulo;
+        this.autor = autor;
+        this.isbn = isbn;
+        this.categoria = categoria || "General";
+        this.disponible = true;
+        this.prestadoA = "Nadie";
+        this.urlPortada = urlPortada || 'https://via.placeholder.com/300x420?text=Sin+Imagen';
+        this.sinopsis = sinopsis || "Sinopsis no disponible.";
     }
-
-    class Socio {
-        constructor(nombre, idSocio) {
-            this.nombre = nombre; this.idSocio = idSocio; this.librosPrestados = [];
-        }
+}
+class Socio {
+    constructor(nombre, idSocio) {
+        this.nombre = nombre;
+        this.idSocio = idSocio;
+        this.librosPrestados = [];
     }
+}
 
-    class Biblioteca {
-        constructor() {
-            this.catalogo = []; this.socios = [];
+/* =========================================================
+   CLASE CONTROLADORA – Biblioteca
+========================================================= */
+class Biblioteca {
+    constructor() {
+        this.catalogo = [];
+        this.socios = [];
+        this.load();              // persistencia
+        if (this.catalogo.length === 0 && this.socios.length === 0) {
             this.inicializarDatos();
-        }
-        inicializarDatos() {
-            this.catalogo.push(new Libro("Halo: The Fall of Reach", "Eric Nylund", "25172552", "Ficción", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgaxDaVFie5bOu0wr3ndILYjbyLmNqwVAb_u1h7_FgoJI6ADhLxCTSYmsqicZyQ9F-WaiXMN-WczvfoAf3VCu1HHg2i3DKcdgbDZyLdw&s=10", "La Caída de Reach tiene lugar en el universo de Halo entre el año 2517 hasta los eventos de 2552. En el universo Halo es posible viajar más rápido que la velocidad de la luz, a través del desliespacio; un espacio donde la relatividad especial no aplica. Esto permite a los humanos colonizar cientos de planetas, los cuales son administrados por el Mando Espacial de las Naciones Unidas (UNSC o MENU en español). Sintiéndose reprimidas por el régimen autoritario del UNSC, algunas colonias se rebelan. Por temor a que los rebeldes desintegren el Consejo de Seguridad, los altos mandos militares aprueban el Proyecto SPARTAN-II; un escuadrón secreto de súper soldados para reprimir discretamente la rebelión."));
-            
-            this.catalogo.push(new Libro("Los guardianes de Ga Hoole I: La captura", "E.L. Swann", "98765432", "Literatura fantástica", "https://books.google.com.bo/books/content?id=Pr6s5dVChKwC&printsec=frontcover&img=1&zoom=1", "Soren nace en el bosque de Tyto, un reino tranquilo en el que habitan las lechuzas comunes. Soren es capturado y trasladado a un desfiladero sombrío e inhóspito. Lo llaman un orfanato, pero la joven lechuza cree que es algo mucho peor. Soren y sus amigos se unen para buscar la verdad y proteger el mundo de las lechuzas de un peligro inconcebible."));
-            
-            this.catalogo.push(new Libro("Harry Potter y la piedra filosofal", "J. K. Rowling", "11223344", "Novela", "https://static.wikia.nocookie.net/esharrypotter/images/9/9a/Harry_Potter_y_la_Piedra_Filosofal_Portada_Espa%C3%B1ol.PNG", "Harry Potter se ha quedado huérfano y vive en casa de sus abominables tíos y el insoportable primo Dudley. Harry se siente muy triste y solo, hasta que un buen día recibe una carta que cambiará su vida para siempre. En ella le comunican que ha sido aceptado como alumno en el Colegio Hogwarts de Magia."));
-            
-            this.socios.push(new Socio("Ana García", 101));
-        }
-        buscarLibro(isbn) { return this.catalogo.find(l => l.isbn == isbn); }
-        buscarSocio(id) { return this.socios.find(s => s.idSocio == id); }
-    }
-
-    const biblio = new Biblioteca();
-
-    function openBox(id) {
-        document.querySelectorAll('.content-box').forEach(b => b.style.display = 'none');
-        document.getElementById(id).style.display = 'block';
-    }
-    function closeBox(id) { document.getElementById(id).style.display = 'none'; }
-
-    function registrarSocio() {
-        const n = document.getElementById("nombreSocio").value;
-        const i = document.getElementById("idSocio").value;
-        if(n && i) {
-            biblio.socios.push(new Socio(n, i));
-            alert("Socio registrado.");
-            document.getElementById("nombreSocio").value = "";
-            document.getElementById("idSocio").value = "";
+            this.save();
         }
     }
 
-    function mostrarSocios() {
-        document.getElementById("lista-socios-render").innerHTML = biblio.socios.map(s => `
-            <div class="socio-card" style="background:#f8fafc; padding:15px; border-radius:12px; margin-bottom:10px; border-left:4px solid var(--primary); display:flex; justify-content:space-between">
-                <div><strong>${s.nombre}</strong><br><small>ID: ${s.idSocio}</small></div>
-                <div style="font-size:12px">Prestados: ${s.librosPrestados.length}</div>
-            </div>`).join("");
+inicializarDatos() {
+  const hp = new URL("").toString();
+  const princ = new URL("https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1666484116i/63065099.jpg").toString();
+
+  this.catalogo.push(new Libro("Harry Potter y la Piedra Filosofal", "J. K. Rowling", "11223344", "Novela", hp,
+    "El inicio de la saga de magia más famosa."));
+  this.catalogo.push(new Libro("El Principito", "A. de Saint-Exupéry", "99887766", "Clásico", princ,
+    "Una fábula sobre la amistad y el sentido de la vida."));
+  this.socios.push(new Socio("Ana García", 101));
+  this.socios.push(new Socio("Luis Pérez", 102));
+}
+
+    /* Punteros (referencias a objetos) */
+    buscarLibro(isbn) { return this.catalogo.find(l => l.isbn == isbn); }
+    buscarSocio(id) { return this.socios.find(s => s.idSocio == id); }
+
+    /* Delete – eliminación y liberación de referencia */
+    eliminarLibro(isbn) {
+        let ptrLibro = this.buscarLibro(isbn);
+        if (!ptrLibro) return toast("No se encontró el libro a eliminar", "warn");
+        if (!confirm(`¿Eliminar "${ptrLibro.titulo}" del catálogo?`)) return;
+
+        this.catalogo = this.catalogo.filter(l => l.isbn !== isbn);
+        ptrLibro = null; // liberar referencia (simulado)
+        this.save(); renderCatalogo();
+        toast("Libro eliminado (delete aplicado)", "ok");
     }
 
-    function mostrarCatalogo() {
-        document.getElementById("catalogo-listado").innerHTML = biblio.catalogo.map(l => `
-            <div class="libro-item" onclick="mostrarDetalleLibro('${l.isbn}')">
-                <img src="${l.urlPortada}" class="libro-portada-lista">
-                <div class="libro-info">
-                    <h4 style="margin:0">${l.titulo}</h4>
-                    <p style="margin:4px 0; font-size:13px">${l.autor}</p>
-                    <small style="color:${l.disponible?'#10b981':'#ef4444'}"><i class="fa-solid fa-circle"></i> ${l.disponible?'Disponible':'Prestado'}</small>
-                </div>
-            </div>`).join("");
+    /* CRUD – crear / actualizar */
+    agregarLibro(objLibro) {
+        // evitar duplicados por ISBN
+        if (this.buscarLibro(objLibro.isbn)) {
+            toast("Ya existe un libro con ese ISBN", "warn");
+            return false;
+        }
+        this.catalogo.push(objLibro);
+        this.save(); return true;
+    }
+    prestar(isbn, idSocio) {
+        let ptrLibro = this.buscarLibro(isbn);
+        let ptrSocio = this.buscarSocio(idSocio);
+
+        if (!ptrLibro || !ptrSocio) { toast("Libro o socio no encontrado", "warn"); return false; }
+        if (!ptrLibro.disponible) { toast("El libro ya está prestado", "warn"); return false; }
+
+        ptrLibro.disponible = false;
+        ptrLibro.prestadoA = ptrSocio.nombre;
+        ptrSocio.librosPrestados.push(ptrLibro.titulo);
+        this.save(); return true;
+    }
+    devolver(isbn, idSocio) {
+        let ptrLibro = this.buscarLibro(isbn);
+        let ptrSocio = this.buscarSocio(idSocio);
+
+        if (!ptrLibro || !ptrSocio) { toast("Libro o socio no encontrado", "warn"); return false; }
+        if (ptrLibro.disponible) { toast("El libro ya está disponible", "warn"); return false; }
+
+        ptrLibro.disponible = true;
+        ptrLibro.prestadoA = "Nadie";
+        ptrSocio.librosPrestados = ptrSocio.librosPrestados.filter(t => t !== ptrLibro.titulo);
+        this.save(); return true;
     }
 
-    function mostrarDetalleLibro(isbn) {
-        const l = biblio.buscarLibro(isbn);
-        document.getElementById('portada-fondo').src = l.urlPortada;
-        document.getElementById('detalle-preview').innerHTML = `
-            <img src="${l.urlPortada}" class="portada-detalle-superior">
-            <h2 style="margin:0; text-align:center">${l.titulo}</h2>
-            <p style="text-align:center; opacity:0.8"><i class="fa-solid fa-pen-nib"></i> ${l.autor} | <i class="fa-solid fa-tag"></i> ${l.categoria}</p>
-            <p style="text-align:center"><strong>ISBN:</strong> ${l.isbn} | <strong>Estado:</strong> ${l.disponible?'Libre':'Prestado a '+l.prestadoA}</p>
-            <div class="sinopsis-box">
-                <strong>Sinopsis Completa:</strong><br><br>
-                ${l.sinopsis}
+    /* CRUD – socios */
+    agregarSocio(nombre, idSocio) {
+        if (!nombre || !idSocio) { toast("Completa nombre e ID", "warn"); return false; }
+        if (this.buscarSocio(idSocio)) { toast("Ya existe un socio con ese ID", "warn"); return false; }
+        this.socios.push(new Socio(nombre, idSocio)); this.save(); return true;
+    }
+    resetSocios(){ this.socios = []; this.save(); }
+
+    /* Persistencia local */
+    save(){ localStorage.setItem("biblio_data", JSON.stringify({catalogo:this.catalogo, socios:this.socios})); }
+    load(){
+        const raw = localStorage.getItem("biblio_data");
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        this.catalogo = (data.catalogo || []).map(l=>new Libro(l.titulo,l.autor,l.isbn,l.categoria,l.urlPortada,l.sinopsis));
+        this.socios = (data.socios || []).map(s=>new Socio(s.nombre, s.idSocio));
+        this.socios.forEach(s => s.librosPrestados = s.librosPrestados || []);
+    }
+}
+
+/* Instancia global */
+const biblio = new Biblioteca();
+
+/* =========================================================
+   UI: Navegación entre cajas
+========================================================= */
+const tabs = document.querySelectorAll(".tab-btn");
+tabs.forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+        tabs.forEach(b=>b.classList.remove("active"));
+        document.querySelectorAll(".content-box").forEach(box=>box.classList.remove("show"));
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.box).classList.add("show");
+        if (btn.dataset.box === "box-catalogo") renderCatalogo();
+        if (btn.dataset.box === "box-socios") renderSocios();
+    });
+});
+
+/* =========================================================
+   UI: Utilidades
+========================================================= */
+const grid = document.getElementById("catalogo-grid");
+const filtroCategoria = document.getElementById("filtro-categoria");
+const filtroDisponible = document.getElementById("filtro-disponible");
+const buscador = document.getElementById("buscador");
+const contador = document.getElementById("contador");
+
+function toast(msg, type="ok"){
+    const el = document.getElementById("toast");
+    el.textContent = msg;
+    el.style.background = (type==="ok") ? "#111827" : "#b45309";
+    el.classList.add("show");
+    setTimeout(()=>el.classList.remove("show"), 2200);
+}
+
+/* Rellenar categorías dinámicamente */
+function refreshCategorias(){
+    const cats = Array.from(new Set(biblio.catalogo.map(l=>l.categoria).filter(Boolean)));
+    filtroCategoria.innerHTML = '<option value="">Todas las categorías</option>' +
+        cats.map(c=>`<option>${c}</option>`).join("");
+}
+
+/* Render catálogo como tarjetas */
+function renderCatalogo(){
+    refreshCategorias();
+    const q = buscador.value.trim().toLowerCase();
+    const cat = filtroCategoria.value;
+    const disp = filtroDisponible.value;
+
+    let lista = [...biblio.catalogo];
+
+    if (q) lista = lista.filter(l=>l.titulo.toLowerCase().includes(q) || l.autor.toLowerCase().includes(q));
+    if (cat) lista = lista.filter(l=>l.categoria === cat);
+    if (disp !== "") lista = lista.filter(l=>String(l.disponible) === disp);
+
+    contador.textContent = `Libros: ${lista.length} / Total: ${biblio.catalogo.length}`;
+
+  
+
+
+const placeholder = 'https://tse3.mm.bing.net/th/id/OIP.ltsk1goleDRmRLw0913QgQHaE6?cb=ucfimgc2&rs=1&pid=ImgDetMain&o=7&rm=3';
+
+grid.innerHTML = lista.map(l => `
+  <article class="book-card">
+    <div class="card-body" style="padding-bottom:0">
+      <h3 class="title">${(l.titulo && l.titulo.trim()) || l.autor || 'Título desconocido'}</h3>
+      <p class="meta" style="margin-bottom:10px">
+        Autor: <strong>${l.autor || '—'}</strong> · ISBN: <strong>${l.isbn || '—'}</strong>
+      </p>
+    </div>
+
+    <div class="cover">
+      <img
+        src="${(l.urlPortada && l.urlPortada.trim()) || placeholder}"
+        alt="${(l.titulo && l.titulo.trim()) || 'Portada'}"
+        loading="lazy"
+        onerror="this.onerror=null; this.src='${placeholder}';"
+     an class="chip"><i class="fa-solid fa-user"></i> Prestado a: ${l.prestadoA}</span>
+        <span class="status ${l.disponible ? 'ok' : 'out'}">${l.disponible ? 'Disponible' : 'Prestado'}</span>
+      </div>
+
+      <details>
+        <summary><i class="fa-solid fa-align-left"></i> Sinopsis</summary>
+        <p style="margin-top:6px; color:#334155">${l.sinopsis || 'Sinopsis no disponible.'}</p>
+      </details>
+    </div>
+
+    <div class="actions">
+      ${l.disponible
+        ? `<button class="btn btn-warning" onclick="prestarDesdeCard('${l.isbn}')"><i class="fa-solid fa-share"></i> Prestar</button>`
+        : `<button class="btn btn-secondary" onclick="devolverDesdeCard('${l.isbn}')"><i class="fa-solid fa-rotate-left"></i> Devolver</button>`
+      }
+      <button class="btn btn-danger" onclick="biblio.eliminarLibro('${l.isbn}')">
+        <i class="fa-solid fa-trash"></i> Delete
+      </button>
+    </div>
+  </article>
+`).join('');
+
+
+
+    // por compatibilidad, también actualizamos el listado simple (no visible)
+    document.getElementById("catalogo-listado").innerHTML =
+        lista.map(l => `
+            <div class="libro-item">
+                <strong>${l.titulo}</strong>
+                <button onclick="biblio.eliminarLibro('${l.isbn}')">Delete</button>
             </div>
-        `;
-    }
+        `).join("");
+}
+buscador.addEventListener("input", renderCatalogo);
+filtroCategoria.addEventListener("change", renderCatalogo);
+filtroDisponible.addEventListener("change", renderCatalogo);
 
-    function agregarLibro() {
-        const t = document.getElementById("titulo").value, a = document.getElementById("autor").value;
-        const i = document.getElementById("isbn").value, c = document.getElementById("categoria").value;
-        const u = document.getElementById("urlPortada").value, s = document.getElementById("sinopsisInput").value;
-        if(t && a && i) {
-            biblio.catalogo.push(new Libro(t, a, i, c, u, s));
-            alert("Libro añadido.");
-            document.querySelectorAll('#boxAgregarLibro input, #boxAgregarLibro textarea').forEach(el => el.value = "");
-            mostrarCatalogo();
-        } else { alert("Faltan datos."); }
-    }
+/* =========================================================
+   CRUD – Crear (Añadir)
+========================================================= */
+function agregarLibro() {
+    const t = titulo.value.trim();
+    const a = autor.value.trim();
+    const i = isbn.value.trim();
+    const c = categoria.value.trim();
+    const u = urlPortada.value.trim();
+    const s = sinopsisInput.value.trim();
 
-    function prestarLibro() {
-        const l = biblio.buscarLibro(document.getElementById("isbnPrestamo").value);
-        const s = biblio.buscarSocio(document.getElementById("idSocioPrestamo").value);
-        if(l && s && l.disponible) {
-            l.disponible = false; l.prestadoA = s.nombre;
-            s.librosPrestados.push(l.titulo); alert("Prestado."); mostrarCatalogo();
-        } else alert("Error en préstamo.");
-    }
+    if (!t || !a || !i){ toast("Título, autor e ISBN son obligatorios", "warn"); return; }
 
-    function devolverLibro() {
-        const l = biblio.buscarLibro(document.getElementById("isbnDevolucion").value);
-        const s = biblio.buscarSocio(document.getElementById("idSocioDevolucion").value);
-        if(l && s && !l.disponible) {
-            l.disponible = true; l.prestadoA = "Nadie";
-            s.librosPrestados = s.librosPrestados.filter(t => t !== l.titulo);
-            alert("Devuelto."); mostrarCatalogo();
-        } else alert("Error en devolución.");
+    const ok = biblio.agregarLibro(new Libro(t,a,i,c,u,s));
+    if (ok){
+        toast("Libro añadido");
+        document.getElementById("form-agregar").reset();
+        renderCatalogo();
+        // saltar a catálogo
+        document.querySelector('[data-box="box-catalogo"]').click();
     }
+}
+
+/* =========================================================
+   CRUD – Actualizar (Préstamo / Devolución)
+========================================================= */
+function prestarLibro() {
+    const ok = biblio.prestar(isbnPrestamo.value.trim(), idSocioPrestamo.value.trim());
+    if (ok){ toast("Libro prestado"); renderCatalogo(); renderSocios(); }
+}
+function devolverLibro() {
+    const ok = biblio.devolver(isbnDevolucion.value.trim(), idSocioDevolucion.value.trim());
+    if (ok){ toast("Libro devuelto"); renderCatalogo(); renderSocios(); }
+}
+
+/* Acciones rápidas desde tarjeta */
+function prestarDesdeCard(isbn){
+    const id = prompt("ID del socio para el préstamo:");
+    if (!id) return;
+    const ok = biblio.prestar(isbn, id.trim());
+    if (ok){ toast("Préstamo registrado"); renderCatalogo(); renderSocios(); }
+}
+function devolverDesdeCard(isbn){
+    const id = prompt("ID del socio que devuelve:");
+    if (!id) return;
+    const ok = biblio.devolver(isbn, id.trim());
+    if (ok){ toast("Devolución registrada"); renderCatalogo(); renderSocios(); }
+}
+
+/* =========================================================
+   Socios – Alta y listado
+========================================================= */
+function agregarSocio(){
+    const nombre = document.getElementById("nuevoSocioNombre").value.trim();
+    const id = document.getElementById("nuevoSocioId").value.trim();
+    const ok = biblio.agregarSocio(nombre, id);
+    if (ok){ toast("Socio añadido"); document.getElementById("nuevoSocioNombre").value=""; document.getElementById("nuevoSocioId").value=""; renderSocios(); }
+}
+function resetSocios(){ if(confirm("¿Eliminar todos los socios?")){ biblio.resetSocios(); renderSocios(); toast("Socios reiniciados"); } }
+function renderSocios(){
+    const ul = document.getElementById("socios-listado");
+    const ul2 = document.getElementById("lista-socios");
+    ul.innerHTML = biblio.socios.map(s=>`<li><strong>${s.nombre}</strong> (ID: ${s.idSocio}) — Prestados: ${s.librosPrestados.length}</li>`).join("");
+    ul2.innerHTML = biblio.socios.map(s=>`<li><strong>${s.nombre}</strong> (ID: ${s.idSocio})</li>`).join("");
+}
+
+/* Primera carga */
+renderCatalogo();
+renderSocios();
 </script>
-
 </body>
 </html>
